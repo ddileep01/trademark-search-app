@@ -16,19 +16,16 @@ const SearchPage = () => {
   const ownerOptions = [
     { label: "Owner 1", value: "owner1" },
     { label: "Owner 2", value: "owner2" },
-    // Add more options as needed
   ];
 
   const lawFirmOptions = [
     { label: "Law firm 1", value: "lf1" },
     { label: "Law firm 2", value: "lf2" },
-    // Add more options as needed
   ];
 
   const attorneysOptions = [
     { label: "Attorney 1", value: "a1" },
     { label: "Attorney 2", value: "a2" },
-    // Add more options as needed
   ];
   const trademarkResults = [
     {
@@ -99,11 +96,9 @@ const SearchPage = () => {
     },
   ];
 
-  // Handle search functionality
   const handleSearch = () => {
     console.log("Search Term:", searchTerm);
     console.log("Applied Filters:", filter);
-    // Perform search logic based on searchTerm and filters
   };
 
   const handleOwnerChange = (selectedOptions) => {
