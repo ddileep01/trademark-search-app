@@ -1,0 +1,55 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --background: #ffffff;
+  --foreground: #171717;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --background: #0a0a0a;
+    --foreground: #ededed;
+  }
+}
+
+body {
+  color: var(--foreground);
+  background: var(--background);
+  font-family: Arial, Helvetica, sans-serif;
+}
+
+@layer utilities {
+  .text-balance {
+    text-wrap: balance;
+  }
+}
+
+.status-button {
+  border: 1px solid #ccc; /* Basic border */
+  border-radius: 9999px; /* Full rounded corners for pill effect */
+  padding: 8px 16px; /* Padding inside the button */
+  cursor: pointer; /* Pointer cursor on hover */
+  transition: background-color 0.3s; /* Smooth transition for background color */
+}
+
+.status-label {
+  pointer-events: none; /* Makes sure clicking the label triggers the input */
+}
+
+.status-button.active {
+  background-color: #4CAF50; /* Active color, change as needed */
+  color: white; /* White text color for active state */
+}
+
+/* You can add specific colors for each status if needed */
+.status-button.active[data-status="Registered"] { background-color: #4CAF50; }
+.status-button.active[data-status="Pending"] { background-color: #FFEB3B; }
+.status-button.active[data-status="Abandoned"] { background-color: #F44336; }
+.status-button.active[data-status="Others"] { background-color: #2196F3; }
+
+.status-button:hover {
+  background-color: #f0f0f0; /* Light grey background on hover for inactive buttons */
+}
+
