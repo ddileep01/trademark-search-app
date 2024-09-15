@@ -4,16 +4,27 @@ import Image from "next/image";
 import axios from "axios";
 import logo from "./assets/logo.png";
 import Select from "react-select";
+  
 
 const SearchPage = () => { 
   
+  const [selectedFilter, setSelectedFilter] = useState('All');
+
+  const filterOptions = [
+    { label: 'All', value: 'All' },
+    { label: 'Registered', value: 'Registered' },
+    { label: 'Pending', value: 'Pending' },
+    { label: 'Abandoned', value: 'Abandoned' },
+    { label: 'Others', value: 'Others' },
+  ];
+
   const [searchTerm, setSearchTerm] = useState(""); 
   const [ownerlist, setOwnerList] = useState([])
   const [lawFirms, setLawFirms] = useState([])
   const [attorneys, setAttroneys] = useState([]) 
   const [templatesdata, setTemplateData] = useState([])
   const [filter, setFilter] = useState({
-    status: "Registered",
+    status: "All",
     owner: [],
     lawFirm: [],
     attorney: [],
@@ -96,7 +107,7 @@ const SearchPage = () => {
             "input_query": searchTerm && searchTerm.length>0 ? searchTerm.toLowerCase() : "check",
             "input_query_type":"",
             "sort_by": "default",
-            "status": [],
+            "status": [filter.status.toLowerCase()],
             "exact_match": false,
             "date_query": false,
             "owners": filter.owner,
@@ -134,6 +145,13 @@ const SearchPage = () => {
   }; 
 
   
+
+  const handleStatusChange = (selectedOptions) => { 
+    console.log("selectedoptions", selectedOptions)
+    
+    setFilter({ ...filter, status:selectedOptions });  
+    getdatatwo();
+  };
 
   const handleOwnerChange = (selectedOptions) => {
     console.log("selected", selectedOptions)
@@ -356,34 +374,24 @@ const SearchPage = () => {
             <div className="bg-white p-4 shadow-md rounded-md w-full mt-8 md:mt-0 mb-4">
               <h3 className="font-bold mb-2 text-black">Status</h3>
               <div className="flex flex-wrap gap-2 text-black">
-                {["All", "Registered", "Pending", "Abandoned", "Others"].map(
-                  (status) => (
-                    <div
-                      key={status}
-                      className={`status-button ${
-                        filter.status === status ? "active" : ""
-                      }`}
-                    >
-                      <input
-                        type="radio"
-                        id={`status-${status}`}
-                        name="status"
-                        value={status}
-                        checked={filter.status === status}
-                        onChange={() => setFilter((prev) => ({ ...prev, status }))}
-                        className="sr-only"
-                      />
-                      <label
-                        htmlFor={`status-${status}`}
-                        className="status-label"
-                      >
-                        {status}
-                      </label>
-                    </div>
-                  )
-                )}
+              <div className="space-x-2 space-y-2">
+      {filterOptions.map((option) => (
+        <button
+          key={option.value}
+          className={`text-white px-4 py-2 rounded-full ${
+            filter.status === option.value
+              ? 'bg-green-600'
+              : 'bg-gray-300'
+          }`}
+          onClick={() => handleStatusChange(option.value)}
+        >
+          {option.label}
+        </button>
+      ))}
+    </div>
               </div>
             </div>
+
 
             {/* Owner Filter */}
             <div className="bg-white p-4 shadow-md rounded-md w-full mb-4 text-black">
@@ -438,35 +446,24 @@ const SearchPage = () => {
           {/* Filters*/}
           <div className="flex flex-col justify-between mb-4 md:ml-8 h-full">
             {/* Status Filter */}
-            <div className="bg-white p-4 shadow-md rounded-md w-full mb-4">
+            <div className="bg-white p-4 shadow-md rounded-md w-full mt-8 md:mt-0 mb-4">
               <h3 className="font-bold mb-2 text-black">Status</h3>
               <div className="flex flex-wrap gap-2 text-black">
-                {["All", "Registered", "Pending", "Abandoned", "Others"].map(
-                  (status) => (
-                    <div
-                      key={status}
-                      className={`status-button ${
-                        filter.status === status ? "active" : ""
-                      }`}
-                    >
-                      <input
-                        type="radio"
-                        id={`status-${status}`}
-                        name="status"
-                        value={status}
-                        checked={filter.status === status}
-                        onChange={() => setFilter({ ...filter, status })}
-                        className="sr-only"
-                      />
-                      <label
-                        htmlFor={`status-${status}`}
-                        className="status-label"
-                      >
-                        {status}
-                      </label>
-                    </div>
-                  )
-                )}
+              <div className="space-x-2 space-y-2">
+      {filterOptions.map((option) => (
+        <button
+          key={option.value}
+          className={`text-white px-4 py-2 rounded-full ${
+            filter.status === option.value
+              ? 'bg-green-600'
+              : 'bg-gray-300'
+          }`}
+          onClick={() => handleStatusChange(option.value)}
+        >
+          {option.label}
+        </button>
+      ))}
+    </div>
               </div>
             </div>
 
