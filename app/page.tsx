@@ -32,6 +32,12 @@ const SearchPage = () => {
     }));
     return formattedOptions
   }
+
+  const onchangestatus = (option) => {
+    console.log("option", option)
+  }
+
+
   const API_URL = 'https://vit-tm-task.api.trademarkia.app/api/v3/us';
 
   const getdata = async () => {
@@ -79,7 +85,7 @@ const SearchPage = () => {
     
     const requestBody = 
         {
-            "input_query": "check",
+            "input_query": searchTerm && searchTerm.length>0 ? searchTerm.toLowerCase() : "check",
             "input_query_type":"",
             "sort_by": "default",
             "status": [],
@@ -111,9 +117,11 @@ const SearchPage = () => {
   };
 
   const handleSearch = () => {
-    // console.log("Search Term:", searchTerm);
-    // console.log("Applied Filters:", filter);
-  };
+    console.log("Search Term:", searchTerm); 
+    getdatatwo()
+  }; 
+
+  
 
   const handleOwnerChange = (selectedOptions) => {
     console.log("selected", selectedOptions)
@@ -323,7 +331,7 @@ const SearchPage = () => {
                         name="status"
                         value={status}
                         checked={filter.status === status}
-                        onChange={() => setFilter({ ...filter, status })}
+                        onChange={() => setFilter((prev) => ({ ...prev, status }))}
                         className="sr-only"
                       />
                       <label
