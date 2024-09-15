@@ -1,118 +1,138 @@
 "use client";
-import React, { useState } from "react";
-import Image from "next/image";
+import React, { useState, useEffect } from "react";
+import Image from "next/image"; 
+import axios from "axios";
 import logo from "./assets/logo.png";
 import Select from "react-select";
 
-const SearchPage = () => {
-  const [searchTerm, setSearchTerm] = useState("");
+const SearchPage = () => { 
+  
+  const [searchTerm, setSearchTerm] = useState(""); 
+  const [ownerlist, setOwnerList] = useState([])
+  const [lawFirms, setLawFirms] = useState([])
+  const [attorneys, setAttroneys] = useState([]) 
+  const [templatesdata, setTemplateData] = useState([])
   const [filter, setFilter] = useState({
     status: "Registered",
     owner: [],
     lawFirm: [],
     attorney: [],
-  });
+  }); 
+  useEffect(() => {
+    getdata()
+  }, [])
+  const returnnewarray = (oldarray) => {
+    const formattedOptions = oldarray.map(item => ({
+      label: item.key, 
+      value: item.key,
+      id: item.doc_count
+    }));
+    return formattedOptions
+  }
+  const API_URL = 'https://vit-tm-task.api.trademarkia.app/api/v3/us';
 
-  const ownerOptions = [
-    { label: "Owner 1", value: "owner1" },
-    { label: "Owner 2", value: "owner2" },
-  ];
+  const getdata = async () => {
+    
+    const requestBody = 
+        {
+            "input_query": "check",
+            "input_query_type":"",
+            "sort_by": "default",
+            "status": [],
+            "exact_match": false,
+            "date_query": false,
+            "owners": filter.owner,
+            "attorneys": filter.attorney,
+            "law_firms": filter.lawFirm,
+            "mark_description_description": [],
+            "classes": [],
+            "page": 1,
+            "rows": 10,
+            "sort_order": "desc",
+            "states":[],
+            "counties":[]
+        
+    };
 
-  const lawFirmOptions = [
-    { label: "Law firm 1", value: "lf1" },
-    { label: "Law firm 2", value: "lf2" },
-  ];
+    try {
+      const response = await axios.post(API_URL, requestBody);
+    // console.log("response", response.data)
+    if(response.data){
+      let owners = response.data.body.aggregations.current_owners.buckets  
+      let firms =  response.data.body.aggregations.law_firms.buckets 
+      let attorneys = response.data.body.aggregations.attorneys.buckets  
+      let tempdata = response.data.body.hits.hits
+      setOwnerList(returnnewarray(owners))
+      setLawFirms(returnnewarray(firms))
+      setAttroneys(returnnewarray(attorneys))
+      setTemplateData(tempdata)
+    }
+    } catch (error) {
+      console.error('Error fetching data:', error);
+    }
+  };
 
-  const attorneysOptions = [
-    { label: "Attorney 1", value: "a1" },
-    { label: "Attorney 2", value: "a2" },
-  ];
-  const trademarkResults = [
-    {
-      logo: "",
-      name: "Meta Logo",
-      owner: "Facebook Inc.",
-      status: "Live / Registered",
-      description:
-        "Computer services, Social Media, Networking, Virtual Communities, Community",
-      classes: ["class 5", "class 84"],
-    },
-    {
-      logo: "",
-      name: "Apple Logo",
-      owner: "Apple Inc.",
-      status: "Live / Registered",
-      description: "Consumer electronics, Mobile devices, Software",
-      classes: ["class 2", "class 12", "class 44"],
-    },
-    {
-      logo: "",
-      name: "Nike Swoosh",
-      owner: "Nike Inc.",
-      status: "Live / Registered",
-      description: "Footwear, Apparel, Sportswear",
-      classes: ["class 6", "class 7", "class 9"],
-    },
-    {
-      logo: "",
-      name: "Tesla T",
-      owner: "Tesla Inc.",
-      status: "Pending",
-      description: "Automobiles, Electric vehicles, Energy products",
-      classes: ["class 5", "class 84"],
-    },
-    {
-      logo: "",
-      name: "Meta Logo",
-      owner: "Facebook Inc.",
-      status: "Live / Registered",
-      description:
-        "Computer services, Social Media, Networking, Virtual Communities, Community",
-      classes: ["class 5", "class 84"],
-    },
-    {
-      logo: "",
-      name: "Apple Logo",
-      owner: "Apple Inc.",
-      status: "Live / Registered",
-      description: "Consumer electronics, Mobile devices, Software",
-      classes: ["class 5", "class 84"],
-    },
-    {
-      logo: "",
-      name: "Nike Swoosh",
-      owner: "Nike Inc.",
-      status: "Live / Registered",
-      description: "Footwear, Apparel, Sportswear",
-      classes: ["class 5", "class 84"],
-    },
-    {
-      logo: "",
-      name: "Tesla T",
-      owner: "Tesla Inc.",
-      status: "Pending",
-      description: "Automobiles, Electric vehicles, Energy products",
-      classes: ["class 5", "class 84"],
-    },
-  ];
+  const getdatatwo = async () => {
+    
+    const requestBody = 
+        {
+            "input_query": "check",
+            "input_query_type":"",
+            "sort_by": "default",
+            "status": [],
+            "exact_match": false,
+            "date_query": false,
+            "owners": filter.owner,
+            "attorneys": filter.attorney,
+            "law_firms": filter.lawFirm,
+            "mark_description_description": [],
+            "classes": [],
+            "page": 1,
+            "rows": 10,
+            "sort_order": "desc",
+            "states":[],
+            "counties":[]
+        
+    };
+
+    try {
+      const response = await axios.post(API_URL, requestBody);
+    // console.log("response", response.data)
+    if(response.data){
+      let tempdata = response.data.body.hits.hits
+      setTemplateData(tempdata)
+    }
+    } catch (error) {
+      console.error('Error fetching data:', error);
+    }
+  };
 
   const handleSearch = () => {
-    console.log("Search Term:", searchTerm);
-    console.log("Applied Filters:", filter);
+    // console.log("Search Term:", searchTerm);
+    // console.log("Applied Filters:", filter);
   };
 
   const handleOwnerChange = (selectedOptions) => {
+    console.log("selected", selectedOptions)
     const owners = selectedOptions
       ? selectedOptions.map((option) => option.value)
       : [];
-    setFilter({ ...filter, owner: owners });
+    setFilter({ ...filter, owner: owners});  
+    getdatatwo()
   };
 
   const handlelawFirmChange = (selectedOptions) => {
-    const lawFirms = selectedOptions
-      ? selectedOptions.map((option) => option.value)
-      : [];
-    setFilter({ ...filter, lawFirm: lawFirms });
+    const selectedLawFirms = selectedOptions
+    ? selectedOptions.map((option) => option.value)
+    : [];
+  
+  // Update the filter state by merging the new lawFirms array with existing values
+  setFilter(prevFilter => ({
+    ...prevFilter,
+    lawFirm: [...prevFilter.lawFirm, ...selectedLawFirms]
+  })); 
+  console.log("lawfirm", lawFirm)
+  getdatatwo()
   };
 
   const handleAttorneysChange = (selectedOptions) => {
@@ -120,6 +140,7 @@ const SearchPage = () => {
       ? selectedOptions.map((option) => option.value)
       : [];
     setFilter({ ...filter, attorney: attorneys });
+    getdatatwo()
   };
 
   return (
@@ -171,7 +192,7 @@ const SearchPage = () => {
                 <h1 className="font-bold">Status</h1>
                 <h1 className="font-bold">Class/Description</h1>
               </div>
-              {trademarkResults.map((result, index) => (
+              {templatesdata.map((result, index) => (
                 <div
                   key={index}
                   className="grid grid-cols-4 gap-4 items-start border-b py-4"
@@ -225,21 +246,21 @@ const SearchPage = () => {
                   {/* Middle column for name and owner */}
                   <div className="flex items-center col-span-1">
                     <div>
-                      <p className="font-bold">{result.name}</p>
-                      <p className="text-sm text-gray-600">{result.owner}</p>
+                      <p className="font-bold">{result._source.law_firm}</p>
+                      <p className="text-sm text-gray-600">{result._source.current_owner}</p>
                     </div>
                   </div>
 
                   {/* Middle column for status */}
                   <div className="text-green-500 font-bold text-center col-span-1">
-                    {result.status}
+                    {result._source.status_type.toUpperCase()}
                   </div>
 
                   {/* Right column for description and classes */}
                   <div className="text-gray-600 col-span-1">
-                    <p>{result.description}</p>
+                    <p>{result._source.mark_description_description[0].slice(0, 80) + '...'}</p>
                     <div className="flex items-center flex-wrap">
-                      {result.classes.map((classItem, index) => (
+                      {result._source.class_codes.map((classItem, index) => (
                         <div
                           key={index}
                           className="flex items-center space-x-2"
@@ -318,8 +339,8 @@ const SearchPage = () => {
               <h3 className="font-bold mb-2 text-black">Owner</h3>
               <Select
                 isMulti
-                options={ownerOptions}
-                value={ownerOptions.filter((option) =>
+                options={ownerlist}
+                value={ownerlist.filter((option) =>
                   filter.owner.includes(option.value)
                 )}
                 onChange={handleOwnerChange}
@@ -333,8 +354,8 @@ const SearchPage = () => {
               <h3 className="font-bold mb-2">Law Firm</h3>
               <Select
                 isMulti
-                options={lawFirmOptions}
-                value={lawFirmOptions.filter((option) =>
+                options={lawFirms}
+                value={lawFirms.filter((option) =>
                   filter.lawFirm.includes(option.value)
                 )}
                 onChange={handlelawFirmChange}
@@ -348,8 +369,8 @@ const SearchPage = () => {
               <h3 className="font-bold mb-2">Attorney</h3>
               <Select
                 isMulti
-                options={attorneysOptions}
-                value={attorneysOptions.filter((option) =>
+                options={attorneys}
+                value={attorneys.filter((option) =>
                   filter.attorney.includes(option.value)
                 )}
                 onChange={handleAttorneysChange}
@@ -403,8 +424,8 @@ const SearchPage = () => {
               <h3 className="font-bold mb-2 text-black">Owner</h3>
               <Select
                 isMulti
-                options={ownerOptions}
-                value={ownerOptions.filter((option) =>
+                options={ownerlist}
+                value={ownerlist.filter((option) =>
                   filter.owner.includes(option.value)
                 )}
                 onChange={handleOwnerChange}
@@ -417,8 +438,8 @@ const SearchPage = () => {
               <h3 className="font-bold mb-2">Law Firm</h3>
               <Select
                 isMulti
-                options={lawFirmOptions}
-                value={lawFirmOptions.filter((option) =>
+                options={lawFirms}
+                value={lawFirms.filter((option) =>
                   filter.lawFirm.includes(option.value)
                 )}
                 onChange={handlelawFirmChange}
@@ -432,8 +453,8 @@ const SearchPage = () => {
               <h3 className="font-bold mb-2">Attorney</h3>
               <Select
                 isMulti
-                options={attorneysOptions}
-                value={attorneysOptions.filter((option) =>
+                options={attorneys}
+                value={attorneys.filter((option) =>
                   filter.attorney.includes(option.value)
                 )}
                 onChange={handleAttorneysChange}
@@ -452,7 +473,7 @@ const SearchPage = () => {
                   <h1 className="font-bold">Status</h1>
                   <h1 className="font-bold">Class/Description</h1>
                 </div>
-                {trademarkResults.map((result, index) => (
+                {templatesdata.map((result, index) => (
                   <div
                     key={index}
                     className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 items-start border-b py-4"
@@ -502,25 +523,25 @@ const SearchPage = () => {
                         </svg>
                       </div>
                       <div>
-                        <p className="font-bold text-black">{result.name}</p>
-                        <p className="text-sm text-gray-600">{result.owner}</p>
+                        <p className="font-bold text-black">{result._source.law_firm}</p>
+                        <p className="text-sm text-gray-600">{result._source.current_owner}</p>
                       </div>
                     </div>
 
                     {/* Column 2: Status */}
                     <div className="text-green-500 font-bold text-center">
-                      {result.status}
+                      {result._source.status_type.toUpperCase()}
                     </div>
 
                     {/* Column 3: Description */}
                     <div className="text-gray-600">
-                      <p>{result.description}</p>
+                      <p>{result._source.mark_description_description[0].slice(0, 80) + '...'}</p>
                     </div>
 
                     {/* Column 4: Classes */}
                     <div className="text-gray-600 col-span-1">
                       <div className="flex flex-wrap items-center">
-                        {result.classes.map((classItem, index) => (
+                        {result._source.class_codes.map((classItem, index) => (
                           <div
                             key={index}
                             className="flex items-center space-x-2"
