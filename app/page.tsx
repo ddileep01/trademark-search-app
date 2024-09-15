@@ -21,6 +21,9 @@ const SearchPage = () => {
   useEffect(() => {
     getdata()
   }, [])
+  useEffect(() => {
+    getdatatwo()
+  }, [filter])
   const returnnewarray = (oldarray) => {
     const formattedOptions = oldarray.map(item => ({
       label: item.key, 
@@ -125,13 +128,14 @@ const SearchPage = () => {
     const selectedLawFirms = selectedOptions
     ? selectedOptions.map((option) => option.value)
     : [];
-  
+    console.log("selectedlawfirms", selectedLawFirms)
   // Update the filter state by merging the new lawFirms array with existing values
-  setFilter(prevFilter => ({
-    ...prevFilter,
-    lawFirm: [...prevFilter.lawFirm, ...selectedLawFirms]
-  })); 
-  console.log("lawfirm", lawFirm)
+  // setFilter(prevFilter => ({
+  //   ...prevFilter,
+  //   lawFirm: selectedLawFirms
+  // })); 
+  setFilter({...filter, lawFirm : selectedLawFirms})
+  console.log("lawfirm", filter.lawFirm)
   getdatatwo()
   };
 
