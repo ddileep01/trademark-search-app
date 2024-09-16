@@ -5,6 +5,10 @@ import axios from "axios";
 import logo from "./assets/Logo.png";
 import Select from "react-select";
   
+type ItemType = {
+  key: string;         
+  doc_count: number;   
+};
 
 const SearchPage = () => { 
   
@@ -39,7 +43,7 @@ const SearchPage = () => {
   useEffect(() => {
     getdatatwo()
   }, [filter])
-  const returnnewarray = (oldarray) => {
+  const returnnewarray = (oldarray:ItemType[]) => {
     const formattedOptions = oldarray.map(item => ({
       label: item.key, 
       value: item.key,
@@ -48,9 +52,9 @@ const SearchPage = () => {
     return formattedOptions
   }
 
-  const onchangestatus = (option) => {
-    console.log("option", option)
-  }
+  // const onchangestatus = (option) => {
+  //   console.log("option", option)
+  // }
 
 
   const API_URL = 'https://vit-tm-task.api.trademarkia.app/api/v3/us';
@@ -146,14 +150,14 @@ const SearchPage = () => {
 
   
 
-  const handleStatusChange = (selectedOptions) => { 
+  const handleStatusChange = (selectedOptions: string) => { 
     console.log("selectedoptions", selectedOptions)
     
     setFilter({ ...filter, status:selectedOptions });  
     getdatatwo();
   };
 
-  const handleOwnerChange = (selectedOptions) => {
+  const handleOwnerChange = (selectedOptions: any[]) => {
     console.log("selected", selectedOptions)
     const owners = selectedOptions
       ? selectedOptions.map((option) => option.value)
@@ -162,7 +166,7 @@ const SearchPage = () => {
     getdatatwo()
   };
 
-  const handlelawFirmChange = (selectedOptions) => {
+  const handlelawFirmChange = (selectedOptions: any[]) => {
     const selectedLawFirms = selectedOptions
     ? selectedOptions.map((option) => option.value)
     : [];
@@ -177,7 +181,7 @@ const SearchPage = () => {
   getdatatwo()
   };
 
-  const handleAttorneysChange = (selectedOptions) => {
+  const handleAttorneysChange = (selectedOptions: any[]) => {
     const attorneys = selectedOptions
       ? selectedOptions.map((option) => option.value)
       : [];
