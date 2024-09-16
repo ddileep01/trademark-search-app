@@ -3,18 +3,32 @@ import React, { useState, useEffect } from "react";
 import Image from "next/image"; 
 import axios from "axios";
 import logo from "./assets/Logo.png";
-import Select from "react-select";
-  
+import Select, { SingleValue, MultiValue } from "react-select";
+
+// Define types for each object in the array
 type ItemType = {
   key: string;         
   doc_count: number;   
 };
 
-const SearchPage = () => { 
-  
-  const [selectedFilter, setSelectedFilter] = useState('All');
+// Define types for the filter state
+type FilterType = {
+  status: string;
+  owner: string[];
+  lawFirm: string[];
+  attorney: string[];
+};
 
-  const filterOptions = [
+// Define types for select options
+type SelectOption = {
+  label: string;
+  value: string;
+};
+
+const SearchPage: React.FC = () => { 
+  const [selectedFilter, setSelectedFilter] = useState<string>('All');
+
+  const filterOptions: SelectOption[] = [
     { label: 'All', value: 'All' },
     { label: 'Registered', value: 'Registered' },
     { label: 'Pending', value: 'Pending' },
@@ -22,122 +36,113 @@ const SearchPage = () => {
     { label: 'Others', value: 'Others' },
   ];
 
-  const [searchTerm, setSearchTerm] = useState(""); 
-  const [ownerlist, setOwnerList] = useState([])
-  const [lawFirms, setLawFirms] = useState([])
-  const [attorneys, setAttroneys] = useState([]) 
-  const [templatesdata, setTemplateData] = useState([])
-  const [filter, setFilter] = useState({
+  const [searchTerm, setSearchTerm] = useState<string>(""); 
+  const [ownerList, setOwnerList] = useState<SelectOption[]>([]);
+  const [lawFirms, setLawFirms] = useState<SelectOption[]>([]);
+  const [attorneys, setAttorneys] = useState<SelectOption[]>([]); 
+  const [templatesData, setTemplateData] = useState<any[]>([]);
+  const [filter, setFilter] = useState<FilterType>({
     status: "All",
     owner: [],
     lawFirm: [],
     attorney: [],
   }); 
 
-  const [loading, setLoading] = useState(false);
-  const [noResults, setNoResults] = useState(false);
+  const [loading, setLoading] = useState<boolean>(false);
+  const [noResults, setNoResults] = useState<boolean>(false);
 
   useEffect(() => {
-    getdata()
-  }, [])
+    getData();
+  }, []);
+
   useEffect(() => {
-    getdatatwo()
-  }, [filter])
-  const returnnewarray = (oldarray:ItemType[]) => {
-    const formattedOptions = oldarray.map(item => ({
+    getDataTwo();
+  }, [filter]);
+
+  const returnNewArray = (oldArray: ItemType[]): SelectOption[] => {
+    const formattedOptions = oldArray.map(item => ({
       label: item.key, 
       value: item.key,
-      id: item.doc_count
     }));
-    return formattedOptions
-  }
-
-  // const onchangestatus = (option) => {
-  //   console.log("option", option)
-  // }
-
+    return formattedOptions;
+  };
 
   const API_URL = 'https://vit-tm-task.api.trademarkia.app/api/v3/us';
 
-  const getdata = async () => {
+  const getData = async () => {
     setLoading(true);
-    const requestBody = 
-        {
-            "input_query": "check",
-            "input_query_type":"",
-            "sort_by": "default",
-            "status": [],
-            "exact_match": false,
-            "date_query": false,
-            "owners": filter.owner,
-            "attorneys": filter.attorney,
-            "law_firms": filter.lawFirm,
-            "mark_description_description": [],
-            "classes": [],
-            "page": 1,
-            "rows": 10,
-            "sort_order": "desc",
-            "states":[],
-            "counties":[]
-        
+    const requestBody = {
+      "input_query": "check",
+      "input_query_type": "",
+      "sort_by": "default",
+      "status": [],
+      "exact_match": false,
+      "date_query": false,
+      "owners": filter.owner,
+      "attorneys": filter.attorney,
+      "law_firms": filter.lawFirm,
+      "mark_description_description": [],
+      "classes": [],
+      "page": 1,
+      "rows": 10,
+      "sort_order": "desc",
+      "states": [],
+      "counties": []
     };
 
     try {
       const response = await axios.post(API_URL, requestBody);
-    // console.log("response", response.data)
-    if(response.data){
-      let owners = response.data.body.aggregations.current_owners.buckets  
-      let firms =  response.data.body.aggregations.law_firms.buckets 
-      let attorneys = response.data.body.aggregations.attorneys.buckets  
-      let tempdata = response.data.body.hits.hits
-      setOwnerList(returnnewarray(owners))
-      setLawFirms(returnnewarray(firms))
-      setAttroneys(returnnewarray(attorneys))
-      setTemplateData(tempdata)
-      setNoResults(tempdata.length === 0);
-    }
+      if (response.data) {
+        const owners = response.data.body.aggregations.current_owners.buckets;
+        const firms = response.data.body.aggregations.law_firms.buckets;
+        const attorneys = response.data.body.aggregations.attorneys.buckets;
+        const tempData = response.data.body.hits.hits;
+        
+        setOwnerList(returnNewArray(owners));
+        setLawFirms(returnNewArray(firms));
+        setAttorneys(returnNewArray(attorneys));
+        setTemplateData(tempData);
+        setNoResults(tempData.length === 0);
+      }
     } catch (error) {
       console.error('Error fetching data:', error);
-      setNoResults(true); 
+      setNoResults(true);
     } finally {
-      setLoading(false); 
-  }
+      setLoading(false);
+    }
   };
 
-  const getdatatwo = async () => {
+  const getDataTwo = async () => {
     setLoading(true);
-    const requestBody = 
-        {
-            "input_query": searchTerm && searchTerm.length>0 ? searchTerm.toLowerCase() : "check",
-            "input_query_type":"",
-            "sort_by": "default",
-            "status": [filter.status.toLowerCase()],
-            "exact_match": false,
-            "date_query": false,
-            "owners": filter.owner,
-            "attorneys": filter.attorney,
-            "law_firms": filter.lawFirm,
-            "mark_description_description": [],
-            "classes": [],
-            "page": 1,
-            "rows": 10,
-            "sort_order": "desc",
-            "states":[],
-            "counties":[]
-        
-    };
+    const requestBody = {
+      "input_query": searchTerm && searchTerm.length > 0 ? searchTerm.toLowerCase() : "check",
+      "input_query_type": "",
+      "sort_by": "default",
+      "status": filter.status ? [filter.status.toLowerCase()] : [], 
+      "exact_match": false,
+      "date_query": false,
+      "owners": filter.owner,
+      "attorneys": filter.attorney,
+      "law_firms": filter.lawFirm,
+      "mark_description_description": [],
+      "classes": [],
+      "page": 1,
+      "rows": 10,
+      "sort_order": "desc",
+      "states": [],
+      "counties": []
+    };    
 
     try {
       const response = await axios.post(API_URL, requestBody);
-    // console.log("response", response.data)
-    if(response.data){
-      let tempdata = response.data.body.hits.hits
-      setTemplateData(tempdata)
-      setNoResults(tempdata.length === 0);
-    }
+      if (response.data) {
+        const tempData = response.data.body.hits.hits;
+        setTemplateData(tempData);
+        setNoResults(tempData.length === 0);
+      }
     } catch (error) {
       console.error('Error fetching data:', error);
-      setNoResults(true); 
+      setNoResults(true);
     } finally {
       setLoading(false);
     }
@@ -145,48 +150,32 @@ const SearchPage = () => {
 
   const handleSearch = () => {
     console.log("Search Term:", searchTerm); 
-    getdatatwo()
+    getDataTwo();
   }; 
 
-  
-
-  const handleStatusChange = (selectedOptions: string) => { 
-    console.log("selectedoptions", selectedOptions)
-    
-    setFilter({ ...filter, status:selectedOptions });  
-    getdatatwo();
+  const handleStatusChange = (selectedOption: string) => {
+    setFilter((prevFilter) => ({
+      ...prevFilter,
+      status: selectedOption
+    }));
   };
 
-  const handleOwnerChange = (selectedOptions: any[]) => {
-    console.log("selected", selectedOptions)
-    const owners = selectedOptions
-      ? selectedOptions.map((option) => option.value)
-      : [];
-    setFilter({ ...filter, owner: owners});  
-    getdatatwo()
+  const handleOwnerChange = (selectedOptions: MultiValue<SelectOption>) => {
+    const owners = selectedOptions.map(option => option.value);
+    setFilter({ ...filter, owner: owners });
+    getDataTwo();
   };
 
-  const handlelawFirmChange = (selectedOptions: any[]) => {
-    const selectedLawFirms = selectedOptions
-    ? selectedOptions.map((option) => option.value)
-    : [];
-    console.log("selectedlawfirms", selectedLawFirms)
-  // Update the filter state by merging the new lawFirms array with existing values
-  // setFilter(prevFilter => ({
-  //   ...prevFilter,
-  //   lawFirm: selectedLawFirms
-  // })); 
-  setFilter({...filter, lawFirm : selectedLawFirms})
-  console.log("lawfirm", filter.lawFirm)
-  getdatatwo()
+  const handleLawFirmChange = (selectedOptions: MultiValue<SelectOption>) => {
+    const selectedLawFirms = selectedOptions.map(option => option.value);
+    setFilter({ ...filter, lawFirm: selectedLawFirms });
+    getDataTwo();
   };
 
-  const handleAttorneysChange = (selectedOptions: any[]) => {
-    const attorneys = selectedOptions
-      ? selectedOptions.map((option) => option.value)
-      : [];
+  const handleAttorneysChange = (selectedOptions: MultiValue<SelectOption>) => {
+    const attorneys = selectedOptions.map(option => option.value);
     setFilter({ ...filter, attorney: attorneys });
-    getdatatwo()
+    getDataTwo();
   };
 
   return (
@@ -262,7 +251,7 @@ const SearchPage = () => {
                 <h1 className="font-bold">Status</h1>
                 <h1 className="font-bold">Class/Description</h1>
               </div>
-              {templatesdata.map((result, index) => (
+              {templatesData.map((result, index) => (
                 <div
                   key={index}
                   className="grid grid-cols-4 gap-4 items-start border-b py-4"
@@ -330,7 +319,7 @@ const SearchPage = () => {
                   <div className="text-gray-600 col-span-1">
                     <p>{result._source.mark_description_description[0].slice(0, 80) + '...'}</p>
                     <div className="flex items-center flex-wrap">
-                      {result._source.class_codes.map((classItem, index) => (
+                      {result._source.class_codes.map((classItem: string | number | bigint | boolean | React.ReactElement<any, string | React.JSXElementConstructor<any>> | Iterable<React.ReactNode> | React.ReactPortal | Promise<React.AwaitedReactNode> | null | undefined, index: React.Key | null | undefined) => (
                         <div
                           key={index}
                           className="flex items-center space-x-2"
@@ -402,8 +391,8 @@ const SearchPage = () => {
               <h3 className="font-bold mb-2 text-black">Owner</h3>
               <Select
                 isMulti
-                options={ownerlist}
-                value={ownerlist.filter((option) =>
+                options={ownerList}
+                value={ownerList.filter((option: { value: string; }) =>
                   filter.owner.includes(option.value)
                 )}
                 onChange={handleOwnerChange}
@@ -421,7 +410,7 @@ const SearchPage = () => {
                 value={lawFirms.filter((option) =>
                   filter.lawFirm.includes(option.value)
                 )}
-                onChange={handlelawFirmChange}
+                onChange={handleLawFirmChange}
                 placeholder="Select Law Firm"
                 className="w-full"
               />
@@ -476,8 +465,8 @@ const SearchPage = () => {
               <h3 className="font-bold mb-2 text-black">Owner</h3>
               <Select
                 isMulti
-                options={ownerlist}
-                value={ownerlist.filter((option) =>
+                options={ownerList}
+                value={ownerList.filter((option: { value: string; }) =>
                   filter.owner.includes(option.value)
                 )}
                 onChange={handleOwnerChange}
@@ -494,7 +483,7 @@ const SearchPage = () => {
                 value={lawFirms.filter((option) =>
                   filter.lawFirm.includes(option.value)
                 )}
-                onChange={handlelawFirmChange}
+                onChange={handleLawFirmChange}
                 placeholder="Select Law Firm"
                 className="w-full"
               />
@@ -525,7 +514,7 @@ const SearchPage = () => {
                   <h1 className="font-bold">Status</h1>
                   <h1 className="font-bold">Class/Description</h1>
                 </div>
-                {templatesdata.map((result, index) => (
+                {templatesData.map((result, index) => (
                   <div
                     key={index}
                     className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 items-start border-b py-4"
@@ -593,7 +582,7 @@ const SearchPage = () => {
                     {/* Column 4: Classes */}
                     <div className="text-gray-600 col-span-1">
                       <div className="flex flex-wrap items-center">
-                        {result._source.class_codes.map((classItem, index) => (
+                        {result._source.class_codes.map((classItem: string | number | bigint | boolean | React.ReactElement<any, string | React.JSXElementConstructor<any>> | Iterable<React.ReactNode> | React.ReactPortal | Promise<React.AwaitedReactNode> | null | undefined, index: React.Key | null | undefined) => (
                           <div
                             key={index}
                             className="flex items-center space-x-2"
