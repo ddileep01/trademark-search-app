@@ -149,6 +149,23 @@ To deploy the application:
    ```bash
    vercel deploy
    ```
+## Output Results
+
+## Large screen UI
+![WhatsApp Image 2024-09-15 at 22 29 10](https://github.com/user-attachments/assets/3c198ff8-fdb3-4a77-98ad-f517022bbeaf)
+![WhatsApp Image 2024-09-15 at 22 29 38](https://github.com/user-attachments/assets/8c84485b-1c1c-4fe0-82c2-d1270cd21bea)
+
+## Empty state screen
+![WhatsApp Image 2024-09-15 at 22 30 21](https://github.com/user-attachments/assets/1435fbfe-00ef-4780-9eee-a8eac71cffbc)
+
+## Loading state screen UI
+![WhatsApp Image 2024-09-15 at 22 32 56](https://github.com/user-attachments/assets/364c5368-971d-404a-bde5-3ff29a9b1a7f)
+
+## Mobile responsive UI
+
+![WhatsApp Image 2024-09-15 at 22 34 35](https://github.com/user-attachments/assets/80a625c9-2580-4073-bbde-92b424e56584)
+![WhatsApp Image 2024-09-15 at 22 34 13](https://github.com/user-attachments/assets/f2fec530-15c5-4ae0-8d0b-876902cedf61)
+
 
 ## Troubleshooting
 
