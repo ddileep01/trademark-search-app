@@ -5,13 +5,12 @@ import axios from "axios";
 import logo from "./assets/Logo.png";
 import Select, { SingleValue, MultiValue } from "react-select";
 
-// Define types for each object in the array
+
 type ItemType = {
   key: string;         
   doc_count: number;   
 };
 
-// Define types for the filter state
 type FilterType = {
   status: string;
   owner: string[];
@@ -19,7 +18,6 @@ type FilterType = {
   attorney: string[];
 };
 
-// Define types for select options
 type SelectOption = {
   label: string;
   value: string;
