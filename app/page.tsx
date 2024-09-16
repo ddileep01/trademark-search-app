@@ -2,7 +2,7 @@
 import React, { useState, useEffect } from "react";
 import Image from "next/image"; 
 import axios from "axios";
-import logo from "./assets/logo.png";
+import logo from "./assets/Logo.png";
 import Select from "react-select";
   
 
